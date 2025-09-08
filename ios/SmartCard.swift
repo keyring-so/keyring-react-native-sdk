@@ -58,24 +58,11 @@ class SmartCard {
       try cmdSet.loadKey(keyPair: keyPair).checkOK()
       os_log("keypair loaded to card");
 
-      let rootKeyPair = try exportKey(cmdSet: cmdSet, path: .rootPath, makeCurrent: false, publicOnly: true)
-      let whisperKeyPair = try exportKey(cmdSet: cmdSet, path: .whisperPath, makeCurrent: false, publicOnly: false)
-      let encryptionKeyPair = try exportKey(cmdSet: cmdSet, path: .encryptionPath, makeCurrent: false, publicOnly: false)
-      let walletKeyPair = try exportKey(cmdSet: cmdSet, path: .walletPath, makeCurrent: false, publicOnly: true)
-
       let info = try ApplicationInfo(cmdSet.select().checkOK().data)
 
       resolve([
         "address": bytesToHex(keyPair.toEthereumAddress()),
         "public-key": bytesToHex(keyPair.publicKey),
-        "wallet-root-address": bytesToHex(rootKeyPair.toEthereumAddress()),
-        "wallet-root-public-key": bytesToHex(rootKeyPair.publicKey),
-        "wallet-address": bytesToHex(walletKeyPair.toEthereumAddress()),
-        "wallet-public-key": bytesToHex(walletKeyPair.publicKey),
-        "whisper-address": bytesToHex(whisperKeyPair.toEthereumAddress()),
-        "whisper-public-key": bytesToHex(whisperKeyPair.publicKey),
-        "whisper-private-key": bytesToHex(whisperKeyPair.privateKey!),
-        "encryption-public-key": bytesToHex(encryptionKeyPair.publicKey),
         "instance-uid": bytesToHex(info.instanceUID),
         "key-uid": bytesToHex(info.keyUID)
       ])

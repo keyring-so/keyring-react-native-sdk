@@ -1,7 +1,7 @@
 {
   "name": "keyring-react-native-sdk",
   "homepage": "https://keyring.so",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "React Native library to interact with Keyring hardware using NFC connection",
   "main": "index.js",
   "scripts": {
