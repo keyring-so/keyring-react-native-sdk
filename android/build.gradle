@@ -15,11 +15,11 @@ buildscript {
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 26
+    compileSdkVersion 34
 
     defaultConfig {
         minSdkVersion 18
-        targetSdkVersion 23
+        targetSdkVersion 34
         versionCode 1
         versionName "1.0"
     }
@@ -46,5 +46,5 @@ dependencies {
     implementation 'com.facebook.react:react-native:+'
     implementation 'org.bouncycastle:bcprov-jdk15on:1.60'
     implementation 'org.apache.commons:commons-lang3:3.9'
-    implementation 'com.github.keyring-so.keyring-hardware-java:android:3.1.1'
+    implementation 'com.github.keyring-so.status-keycard-java:android:0.0.1'
 }
