@@ -60,6 +60,8 @@ public class SmartCard extends BroadcastReceiver implements CardListener {
     private static final int WORDS_LIST_SIZE = 2048;
     private final Object lock = new Object();
 
+    private static final String TAG_LOST = "Tag was lost.";
+
     public SmartCard(ReactContext reactContext) {
         this.cardManager = new NFCCardManager();
         this.cardManager.setCardListener(this);
@@ -306,7 +308,7 @@ public class SmartCard extends BroadcastReceiver implements CardListener {
     }
 
     public WritableMap factoryReset() throws IOException, APDUException {
-        GlobalPlatformCommandSet cmdSet = new GlobalPlatformCommandSet(this.cardChannel);
+        GlobalPlatformCommandSet cmdSet = gpCommandSet();;
         cmdSet.select().checkOK();
         Log.i(TAG, "ISD selected");
 
@@ -672,6 +674,16 @@ public class SmartCard extends BroadcastReceiver implements CardListener {
 
         cmdSet.autoOpenSecureChannel();
         Log.i(TAG, "secure channel opened");
+    }
+
+    private GlobalPlatformCommandSet gpCommandSet() throws IOException {
+        synchronized(lock) {
+            if (this.cardChannel != null) {
+                return new GlobalPlatformCommandSet(this.cardChannel);
+            }
+        }
+
+        throw new IOException("");
     }
 
 }
