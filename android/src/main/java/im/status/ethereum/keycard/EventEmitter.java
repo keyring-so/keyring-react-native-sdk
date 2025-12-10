@@ -45,4 +45,12 @@ public class EventEmitter {
     public void removeCallbacksAndMessages() {
         handler.removeCallbacksAndMessages(null);
     }
+
+    public void addListener(String eventName) {
+        // Keep empty — called automatically from JS
+    }
+
+    public void removeListeners(int count) {
+        // Keep empty — called automatically from JS
+    }
 }
