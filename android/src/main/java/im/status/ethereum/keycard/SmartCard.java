@@ -48,7 +48,8 @@ public class SmartCard extends BroadcastReceiver implements CardListener {
     private CardChannel cardChannel;
     private EventEmitter eventEmitter;
     private static final String TAG = "SmartCard";
-    private Boolean started = false;
+    private boolean started = false;
+    private volatile boolean listening = false;
     private HashMap<String, String> pairings;
 
     private static final String MASTER_PATH = "m";
@@ -57,6 +58,9 @@ public class SmartCard extends BroadcastReceiver implements CardListener {
     private static final String WHISPER_PATH = "m/43'/60'/1581'/0'/0";
     private static final String ENCRYPTION_PATH = "m/43'/60'/1581'/1'/0";
     private static final int WORDS_LIST_SIZE = 2048;
+    private final Object lock = new Object();
+
+    private static final String TAG_LOST = "Tag was lost.";
 
     public SmartCard(ReactContext reactContext) {
         this.cardManager = new NFCCardManager();
@@ -101,15 +105,43 @@ public class SmartCard extends BroadcastReceiver implements CardListener {
         }
     }
 
+    public void startNFC() {
+        Log.i(TAG, "startNFC called");
+        synchronized(lock) {
+            this.listening = true;
+            if (this.cardChannel != null) {
+                eventEmitter.emit("keyCardOnConnected", null);
+            }
+        }
+    }
+
+    public void stopNFC() {
+        Log.i(TAG, "stopNFC called");
+        synchronized(lock) {
+            this.listening = false;
+        }
+    }
+
     @Override
     public void onConnected(final CardChannel channel) {
-        this.cardChannel = channel;
-        eventEmitter.emit("keyCardOnConnected", null);
+        Log.i(TAG, "onConnected called " + this.listening);
+        synchronized(lock) {
+            this.cardChannel = channel;
+            if (this.listening) {
+                eventEmitter.emit("keyCardOnConnected", null);
+            }
+        }
     }
 
     @Override
     public void onDisconnected() {
-        eventEmitter.emit("keyCardOnDisconnected", null);
+        synchronized(lock) {
+            this.cardChannel = null;
+            
+            if (this.listening) {
+                eventEmitter.emit("keyCardOnDisconnected", null);
+            }
+        }
     }
 
     @Override
@@ -276,7 +308,7 @@ public class SmartCard extends BroadcastReceiver implements CardListener {
     }
 
     public WritableMap factoryReset() throws IOException, APDUException {
-        GlobalPlatformCommandSet cmdSet = new GlobalPlatformCommandSet(this.cardChannel);
+        GlobalPlatformCommandSet cmdSet = gpCommandSet();;
         cmdSet.select().checkOK();
         Log.i(TAG, "ISD selected");
 
@@ -642,6 +674,16 @@ public class SmartCard extends BroadcastReceiver implements CardListener {
 
         cmdSet.autoOpenSecureChannel();
         Log.i(TAG, "secure channel opened");
+    }
+
+    private GlobalPlatformCommandSet gpCommandSet() throws IOException {
+        synchronized(lock) {
+            if (this.cardChannel != null) {
+                return new GlobalPlatformCommandSet(this.cardChannel);
+            }
+        }
+
+        throw new IOException("");
     }
 
 }
