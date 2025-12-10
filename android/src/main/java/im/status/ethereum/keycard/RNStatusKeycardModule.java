@@ -513,4 +513,15 @@ public class RNStatusKeycardModule extends ReactContextBaseJavaModule implements
         smartCard.setPairings(pairings);
         promise.resolve(true);
     }
+
+    // RN >= 0.65 required methods
+    @ReactMethod
+    public void addListener(String eventName) {
+        // no-op
+    }
+
+    @ReactMethod
+    public void removeListeners(int count) {
+        // no-op
+    }
 }
