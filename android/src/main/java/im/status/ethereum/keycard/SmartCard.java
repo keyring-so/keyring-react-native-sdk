@@ -306,7 +306,7 @@ public class SmartCard extends BroadcastReceiver implements CardListener {
     }
 
     public WritableMap factoryReset() throws IOException, APDUException {
-        GlobalPlatformCommandSet cmdSet = new GlobalPlatformCommandSet(this.cardChannel);
+        GlobalPlatformCommandSet cmdSet = new KeycardCommandSet(this.cardChannel);
         cmdSet.select().checkOK();
         Log.i(TAG, "ISD selected");
 
